@@ -1,0 +1,14 @@
+{
+  "app-user-id":"Bluetooth97-50002-50002",
+  "app-id":"TridentMedallion_1.0",
+  "platform":"WEARABLE",
+  "tags":{
+     "hardware-id":"M777-4141-0001",
+     "bluetooth-major":"50002",
+     "bluetooth-minor":"50002",
+     "nfc-id":"NF-554499",
+     "status":"INACTIVE",
+     "status-reason":"INVENTORY"
+  },
+  "user-id":"oceanId-3e70ae8c-aae1-46c5-8685-a3399f3119fb"
+}
