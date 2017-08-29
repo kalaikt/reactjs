@@ -1,17 +1,3 @@
-/*
-Copyright notice:
-
-Xevo Application Library
-Copyright © 2017 Xevo Inc.
-Patents Pending
-All rights reserved.
-This file contains confidential and proprietary information of Xevo Inc.
-Unauthorized reproduction or distribution of this document is strictly prohibited.
-Xevo Inc.
-Website: www.xevo.com
-Email: info@xevo.com
-*/
-
 import Data from './data'
 import Cookies from 'js-cookie'
 import deviceMockData from './mock/device-id-mock.json'

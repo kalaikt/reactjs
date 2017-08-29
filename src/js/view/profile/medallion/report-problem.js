@@ -1,14 +1,5 @@
-/*
-  Xevo Application Library
-  Copyright © 2017 Xevo Inc.
-  Patents Pending
-  All rights reserved.
-  This file contains confidential and proprietary information of Xevo Inc.
-  Unauthorized reproduction or distribution of this document is strictly prohibited.
-  Xevo Inc.
-  Website: www.xevo.com
-  Email: info@xevo.com
-*/
+
+
 
 import React from 'react'
 import { connect } from 'react-redux'
