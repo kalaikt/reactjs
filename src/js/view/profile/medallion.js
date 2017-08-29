@@ -26,9 +26,16 @@ import LostMode from './medallion/lost-mode'
 import ReportProblem from './medallion/report-problem'
 import ReportNow from './medallion/report-now'
 
+const SUB_PAGE_COMPONENTS = {
+  'my-medallion': FindMyMedallion,
+  'lost-mode': LostMode,
+  'report-problem': ReportProblem,
+  'report-now': ReportNow,
+}
+
 class Medallion extends React.Component {
-  constructor (props) {
-    super(props);
+  constructor() {
+    super(...arguments);
 
     this.onPageDismiss = this.onPageDismiss.bind(this);
     this.onLostMode = this.onLostMode.bind(this);
@@ -37,18 +44,18 @@ class Medallion extends React.Component {
   static defaultProps = {
     isOpen: false,
     className: '',
-    changeExpandedSize: function () {},
-    changeDefaultSize: function () {},
+    changeExpandedSize: function() {},
+    changeDefaultSize: function() {},
   };
 
-  render () {
+  render() {
     const classNames = this.props.className.split(' ').reduce((classNames, className) => {
-      return (classNames += (' ' + (CSS[className] || className)));
+      return(classNames +=(' ' +(CSS[className] || className)));
     }, `${CSS.medallion} ${(this.props.isOpen ? 'open' : 'closed')} ${(this.props.isMoving && 'moving')}`);
 
     const filteredProps = Object.assign({}, this.props);
 
-    return (
+    return(
       <div>
         {this.page()}
         <Bubble {...filteredProps} className={classNames}
@@ -59,32 +66,30 @@ class Medallion extends React.Component {
     );
   }
 
-  stages () {
+  stages() {
     return this._stages = { title: this.title(), content: this.content() };
   }
 
-  onPageDismiss () {
+  onPageDismiss() {
     this.setState({ page: '' });
     this.props.router.push('/profile/medallion');
   }
 
-  page () {
-    if (this.props.params.subPage == 'my-medallion')
-      return <FindMyMedallion onDismiss={this.onPageDismiss} />;
-    else if (this.props.params.subPage == 'lost-mode')
-      return <LostMode onDismiss={this.onPageDismiss} />;
-    else if (this.props.params.subPage == 'report-problem')
-      return <ReportProblem onDismiss={this.onPageDismiss} />;
-    else if (this.props.params.subPage == 'report-now')
-      return <ReportNow onDismiss={this.onPageDismiss}/>;
-    else
-      return null;
+  page() {
+    const subPage = this.props.params.subPage
+    const Comp = SUB_PAGE_COMPONENTS[subPage]
+
+    if( !Comp ) {
+      return null
+    }
+
+    return <Comp onDismiss={ this.onPageDismiss }/>
   }
 
-  title () {
-    const className = (
-      (CSS.title) + ' title ' +
-      (!this.props.isOpen ? 'visible' : 'hidden')
+  title() {
+    const className =(
+     (BubbleFormCSS.smallTitle) + ' title ' +
+     (!this.props.isOpen ? 'visible' : 'hidden')
     );
     return [{
       canBeDocked: false,
@@ -92,22 +97,22 @@ class Medallion extends React.Component {
     }];
   }
 
-  content () {
-    const className = (
+  content() {
+    const className =(
       CSS.content + ' content ' +
-      (this.props.isOpen ? 'visible' : 'hidden')
+     (this.props.isOpen ? 'visible' : 'hidden')
     );
 
     return [{
       canBeDocked: true,
-      jsx: (
+      jsx:(
           <div className={BubbleFormCSS.headerNoProgress}>
             {i18n.t('medallion')}
           </div>
       )
     },{
       canBeDocked: false,
-      jsx: (
+      jsx:(
         <div className={className}>
           <div className={_CSS.section}>
             <div className={_CSS.row}>
@@ -140,19 +145,19 @@ class Medallion extends React.Component {
     }];
   }
 
-  onLostMode () {
+  onLostMode() {
     this.props.router.push('/profile/medallion/lost-mode')
   }
 
-  medallionSerialNumber () {
-    return (
+  medallionSerialNumber() {
+    return(
       <div className={_CSS.italicDetail}>
         SN: 1212121212</div>
     );
   }
 
-  medallionActiveStatus () {
-    return (
+  medallionActiveStatus() {
+    return(
       <div className={CSS.boldDetail}>
         <div className={CSS.activeImage}></div>
         <div>{i18n.t('active')}</div>
@@ -161,4 +166,4 @@ class Medallion extends React.Component {
   }
 }
 
-export default withRouter(Medallion);
+export default withRouter( Medallion );
