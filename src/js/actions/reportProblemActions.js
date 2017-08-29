@@ -1,50 +1,59 @@
-import * as types from './actionTypes';
+/*
+  Xevo Application Library
+  Copyright © 2017 Xevo Inc.
+  Patents Pending
+  All rights reserved.
+  This file contains confidential and proprietary information of Xevo Inc.
+  Unauthorized reproduction or distribution of this document is strictly prohibited.
+  Xevo Inc.
+  Website: www.xevo.com
+  Email: info@xevo.com
+*/
+
+import * as types from './actionTypes'
 import MedallionService from '../data/medallion-service'
 import logger from 'exm-logger'
 
-export default{
-  sendReportProblem: function(data, device_id) {
-    return (dispatch, getState) => {
-      const state = getState();
-      const accessToken = state.session.access_token;
-
-      return MedallionService.sendReportProblem(data, device_id, accessToken).then((response) => {
+export function sendReportProblem(formData, deviceId) {
+  return (dispatch, getState) => {
+    return MedallionService.sendReportProblem( formData, deviceId )
+      .then((response) => {
         dispatch({type: types.SEND_REPORT_PROBLEM_SUCCESS, response})
-      }, (error) => {
+      })
+      .catch((error) => {
         dispatch({type: types.SEND_REPORT_PROBLEM_FAILURE, error})
       })
-    }
-  },
+  }
+}
 
-  getDeviceInfo: function() {
-    return (dispatch, getState) => {
-      const state = getState();
-      const guestId = state.session.userId;
-      const accessToken = state.session.access_token;
+export function getDeviceInfo() {
+  return (dispatch, getState) => {
+    const guestId = getState().session.userId
 
-      return MedallionService.getDeviceId(guestId, accessToken).then((response) => {
+    return MedallionService.getDeviceId( guestId )
+      .then((response) => {
         dispatch({type: types.FETCH_DEVICE_ID_SUCCESS, response})
-        return response;
-      }, (error) => {
+        return response
+      })
+      .catch((error) => {
         dispatch({type: types.FETCH_DEVICE_ID_FAILURE, error})
-        return error;
+        return error
       })
-    }
-  },
+  }
+}
 
-  fetchReportProblemOptions: function() {
-    return (dispatch, getState) => {
-      const state = getState();
-      const guestId = state.session.userId;
-      const accessToken = state.session.access_token;
+export function fetchReportProblemOptions() {
+  return (dispatch, getState) => {
+    const guestId = getState().session.userId
 
-      return MedallionService.fetchReportProblemOptions(guestId, accessToken).then((response) => {
+    return MedallionService.fetchReportProblemOptions( guestId )
+      .then((response) => {
         dispatch({type: types.FETCH_REPORT_PROBLEM_SUCCESS, response})
-        return response;
-      }, (error) => {
-        dispatch({type: types.FETCH_REPORT_PROBLEM_FAILURE, error})
-        return error;
+        return response
       })
-    }
+      .catch((error) => {
+        dispatch({type: types.FETCH_REPORT_PROBLEM_FAILURE, error})
+        return error
+      })
   }
 }

@@ -25,56 +25,50 @@ import medallionImage from './../../../../img/medallion3.png'
 import _CSS from '../../../../css/profile/_common.sass'
 import CSS from '../../../../css/profile/medallion.sass'
 
-class ReportNow extends React.Component {
-  constructor (props) {
-    super(props);
-  }
+const ReportNow = (props) => {
+  return(
+    <PageContainer
+      header={ makeHeader(props) }
+      content={ makeContent() }
+    />
+  )
+}
 
-  static defaultProps = {
-    onDismiss: function () {}
-  };
+function makeHeader(props) {
+  return(
+    <PageHeader icon='arrow-left'
+      onBackClick={ props.onDismiss }
+      title={ i18n.t('report_a_problem') }/>
+  )
+}
 
-  render () {
-    return (
-      <PageContainer
-        header={ this.header() }
-        content={ this.content() }
-      />
-    );
-  }
-
-  header () {
-    return (
-      <PageHeader icon='arrow-left'
-        onBackClick={ this.props.onDismiss }
-        title={ i18n.t('report_a_problem') }/>
-    );
-  }
-
-  content () {
-    return (
-      <PageContent>
-        <div className={ CSS.centerLayout }>
-          <div className={ _CSS.section }>
-            <div className={ _CSS.row }>
-              <div >
-                <img className={ CSS.medallion } src={ medallionImage }/>
-              </div>
-              <div className={_CSS.sectionHeader}>
-                { i18n.t('not_registering_my_location') }
-              </div>
-              <div>
-                { i18n.t('report_now_txt') }
-              </div>
+function makeContent() {
+  return(
+    <PageContent>
+      <div className={ CSS.centerLayout }>
+        <div className={ _CSS.section }>
+          <div className={ _CSS.row }>
+            <div>
+              <img className={ CSS.medallion } src={ medallionImage }/>
             </div>
-            <div className={ _CSS.row }>
-              <TextLink label={ i18n.t('get_assistance') }/>
+            <div className={_CSS.sectionHeader}>
+              { i18n.t('not_registering_my_location') }
+            </div>
+            <div>
+              { i18n.t('report_now_txt') }
             </div>
           </div>
+          <div className={ _CSS.row }>
+            <TextLink label={ i18n.t('get_assistance') }/>
+          </div>
         </div>
-      </PageContent>
-    );
-  }
+      </div>
+    </PageContent>
+  )
+}
+
+ReportNow.propTypes = {
+  onDismiss: React.PropTypes.func.isRequired,
 }
 
 export default ReportNow

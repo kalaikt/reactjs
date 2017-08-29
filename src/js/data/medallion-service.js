@@ -14,15 +14,14 @@ Email: info@xevo.com
 
 import Data from './data'
 import Cookies from 'js-cookie'
-import logger from 'exm-logger'
+import deviceMockData from './mock/device-id-mock.json'
+import reportProblemsMockData from './mock/report-problem-mock.json'
 
 export default class MedallionService extends Data {
+  static cachedResponse = {}
+
   static get url() {
     return `${this.baseUrl('xos-url')}/products/medallions/journeys`
-  }
-
-  static get xosUrl() {
-    return this.baseUrl('xos-url')
   }
 
   static fetchOptions(id) {
@@ -30,83 +29,106 @@ export default class MedallionService extends Data {
       return Promise.resolve(this.cachedResponse.res)
     }
     const url = `${this.url}/${id}`
-    const requestOptions = {
-      method: 'get',
-      headers: {
-        'Authorization': `Bearer ${Cookies.get('ocean_auth_token')}`,
-      },
-      //forceMock: true,
-      shortError: true,
-    }
-    return this.handleFetch(url, requestOptions, require('!!file!./mock/medallion.json')).then(res => {
-      this.cachedResponse = {id, res};
-      return Promise.resolve(res);
+    return this.httpRequest(url, {}, require('!!file!./mock/medallion.json')).then(res => {
+      this.cachedResponse = {id, res}
+      return Promise.resolve(res)
     })
   }
 
-  static httpApiRequest( url, headers, mockData = {} ){
-    return this.httpRequest( url, headers, mockData )
-        .then( response => {
-            return Promise.resolve( response );
-        })
-        .catch( error => {
-            const errorMessage = error && error.errorDetail
-            const shortError = errorMessage && errorMessage.split(/\r|\n/)[0] || error
-            return Promise.reject( shortError )
-        });
+  static httpApiRequest( url, options, mockData = {} ){
+    return this.httpRequest( url, options, mockData )
+      .catch(( error ) => {
+        const errorMessage = error && error.errorDetail
+        const shortError = errorMessage && errorMessage.split(/\r|\n/)[0] || error
+        return Promise.reject( shortError )
+      })
   }
 
-  static sendReportProblem( data = {}, device_id, accessToken ) {
-      const url = `${this.baseUrl('xos-url')}/medallions/${device_id}/problemreport`;
-      const headers = {
-          method: 'PUT',
-          Authorization: `Basic ${accessToken}`,
-          data: data,
-      };
-
-      return this.httpApiRequest( url, headers );
+  static sendReportProblem( formData, deviceId ) {
+    return this.httpApiRequest( `${this.baseUrl('xos-url')}/medallions/${deviceId}/problemreport`, {
+      method: 'PUT',
+      data: formData
+    })
   }
 
-  static getDeviceId( guestId, accessToken ) {
-      const url = `${this.baseUrl('xos-url')}/users/${guestId}/medallions`
-      const headers = {
-          method: 'GET',
-          Authorization: `Basic ${accessToken}`,
-          forceMock: true,
-      }
-
-      return this.httpApiRequest( url, headers, require('!!file!./mock/device-id-mock.json') );
+  static getDeviceId( guestId ) {
+    return this.httpApiRequest( `${this.baseUrl('xos-url')}/users/${guestId}/medallions`, {
+      method: 'GET'
+    })
   }
 
-  static fetchReportProblemOptions( guestId , accessToken ) {
-      const url = `${this.baseUrl('xos-url')}/medallions/${guestId}/problems`
-      const headers = {
-          method: 'GET',
-          Authorization: `Basic ${accessToken}`,
-          forceMock: true,
-      }
+  static fetchReportProblemOptions( guestId ) {
+    // TODO: Remove this once the service api is implemented
+    return Promise.resolve(reportProblemsMockData)
 
-      return this.httpApiRequest( url, headers, require('!!file!./mock/report-problem-mock.json') );
+    return this.httpApiRequest( `${this.baseUrl('xos-url')}/medallions/${guestId}/problems`, {
+      method: 'GET'
+    })
   }
 
   static fetchMedallionOptions(options={}) {
     const {
       journeyId,
-      state,
-      country
+      state = 'FL',
+      country = 'US',
     } = options
 
+    const jcsid = `m-${journeyId}::${country}::${state}`
+    if (this.cachedResponse && this.cachedResponse[jcsid]) {
+      return Promise.resolve(this.cachedResponse[jcsid])
+    }
+
     const url = `${this.url}/${journeyId}?shippingAddressCountry=${country}&shippingAddressState=${state}`
+    const requestOptions = {
+      mockTag: 'fetchMedallionOptions',
+    }
+    return this.httpRequest(url, requestOptions, require('!!file!./mock/medallion.json')).then(response => {
+      this.cachedResponse = {
+        ...this.cachedResponse,
+        [jcsid]: response,
+      }
+      return response
+    })
+  }
+
+  static fetchAccessoryOptions(options={}) {
+    const {
+      journeyId,
+      state = 'FL',
+      country = 'US',
+    } = options
+
+    const jcsid = `a-${journeyId}::${country}::${state}`
+    if (this.cachedResponse && this.cachedResponse[jcsid]) {
+      return Promise.resolve(this.cachedResponse[jcsid])
+    }
+
+    const baseUrl = `${this.baseUrl('xos-url')}/products/medallionsaccessories/journeys`
+    const url = `${baseUrl}/${journeyId}?shippingAddressCountry=${country}&shippingAddressState=${state}`
+    const requestOptions = {
+      mockTag: 'fetchAccessoryOptions',
+    }
+    return this.httpRequest(url, requestOptions, require('!!file!./mock/medallion-accessories.json')).then((response) => {
+      this.cachedResponse = {
+        ...this.cachedResponse,
+        [jcsid]: response,
+      }
+      return response
+    })
+  }
+
+  static fetchCountryEligibility(options={}) {
+    const {
+      journeyId,
+    } = options
+    const url = `${this.baseUrl('xos-url')}/journeys/${journeyId}/medallion/eligiblecountries`
     const requestOptions = {
       method: 'get',
       headers: {
         'Authorization': `Bearer ${Cookies.get('ocean_auth_token')}`,
       },
       shortError: true,
-      mockTag: 'fetchMedallionOptions',
     }
-    return this.handleFetch(url, requestOptions, require('!!file!./mock/medallion.json')).then(response => {
-      return response
-    })
+    return this.httpRequest(url, requestOptions, require('!!file!./mock/country-eligibility.json'))
   }
 }
